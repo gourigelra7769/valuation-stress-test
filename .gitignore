@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+build/
+dist/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing
+coverage/
+
+# Deployment
+.vercel/
+
+# Editor and operating system
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Python generated files
+__pycache__/
+*.py[cod]
+.venv/
+venv/
