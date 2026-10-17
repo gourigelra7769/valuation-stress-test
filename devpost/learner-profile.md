@@ -37,7 +37,7 @@ Wants to provide input when needed. Specific decisions they want to own are not 
 Needs guided planning across scope, product requirements, and technical specification before implementation. Solo builder under a short hackathon deadline; keep the MVP realistic and focused on correct financial calculations and a polished UI.
 
 ## Review Format
-not established
+markdown
 
 ## Notes and Open Questions
-Validate the proposed feature set against the deadline during `2-scope`. Source selection, company inputs, valuation date, and calculation details remain for planning stages.
+Scope and PRD are approved. Company-specific datasets still require evidence-backed verification before a company is eligible; the specification must keep that audit separate from implementation and must not invent company values.
