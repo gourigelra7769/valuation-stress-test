@@ -1,0 +1,88 @@
+# Microsoft source audit (not eligible)
+
+Audit research captured on **2026-10-18**. This is an evidence log, not a company dataset. Microsoft remains `candidate` in `index.json`; no valuation inputs are loaded into the app. Values below are transcribed or transparently calculated from the listed sources and are not production inputs while the unresolved fields remain.
+
+## Reference and reporting dates
+
+- Company: Microsoft Corporation, MSFT, Nasdaq; reporting currency USD.
+- Latest complete fiscal year: July 1, 2025–June 30, 2026 (FY2026).
+- Latest balance sheet available before the market reference: June 30, 2026.
+- Proposed market reference: October 16, 2026 closing price, after the FY2026 Form 10-K was filed July 29, 2026.
+- Monetary reporting tables use USD millions. Per-share price uses USD/share. Shares in the proposed dataset would use millions of shares. Rates use decimals.
+
+## Sources consulted
+
+1. [Microsoft FY2026 Form 10-K, SEC filing](https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm), filed July 29, 2026; year ended June 30, 2026. SEC filing index: https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/0001193125-26-323660-index.htm. Accessed October 18, 2026. Relevant locators: cover (shares outstanding); consolidated statements of income, cash flows, balance sheets, and stockholders' equity; Note 6 (property/equipment depreciation and intangible amortization); debt note; liquidity and capital resources.
+2. [Microsoft FY2026 Q4 earnings release and financial statements](https://www.microsoft.com/en-us/investor/earnings/fy-2026-q4/press-release-webcast), published July 29, 2026. Accessed October 18, 2026. The release repeats FY2026 statements and June 30 balance-sheet figures in USD millions.
+3. [Yahoo Finance MSFT historical prices](https://finance.yahoo.com/quote/MSFT/history/), accessed October 18, 2026. Historical table reports October 16, 2026 close of $529.05. This is a secondary quote source. The Nasdaq historical page was also checked, but did not expose a historical price in the reviewed page.
+4. [Microsoft Investor Relations FAQ](https://www.microsoft.com/en-us/investor/faq), accessed October 18, 2026, question “Do you issue preferred stock?” Microsoft answers: “Microsoft no longer offers preferred shares.” This is a current FAQ statement; it does not state an outstanding balance as of June 30, 2026.
+
+## Evidence inventory and calculation notes
+
+| Input or group | Reported evidence / proposed method | Date and unit | Status |
+|---|---|---|---|
+| Revenue, EBIT, pretax income, tax expense | FY2026 reported values: 331,839; 155,237; 165,934; 32,185. Effective tax rate would be 32,185 / 165,934. | FY ended 2026-06-30; USD millions (rate decimal) | Supported by Microsoft earnings release and 10-K. |
+| Interest expense | Note 3, “Other income (expense), net,” explicitly lists interest expense of (3,051) for the year ended 2026-06-30, in USD millions. For the required positive expense input, use magnitude 3,051 and retain the filed negative presentation in provenance. This is interest expense, not net interest expense. | FY ended 2026-06-30; USD millions | **Resolved** by the FY2026 10-K; no proxy from cash interest paid is needed. |
+| CapEx | Additions to property and equipment reported as cash outflow (115,948); model convention would store positive spend 115,948 and preserve reported sign -115,948 with a normalization note. | FY ended 2026-06-30; USD millions | Supported. |
+| D&A | Note 6 separately reports depreciation expense of $34.3 billion (Property and Equipment) and intangible asset amortization of $4.7 billion (Intangible Assets), both rounded to $0.1 billion. The cash-flow statement (in millions) reports the combined caption “Depreciation, amortization, and other” at 38,534. | FY ended 2026-06-30; USD millions | **Unresolved.** The two pure components support an explicitly approximate sum of $39,000 million, with source precision only to about $100 million; they do not establish an exact value. The 38,534 million cash-flow figure is exact at the displayed unit but includes “other,” so it cannot be substituted as pure D&A. |
+| Cash and short-term securities | June 30 balance sheet separately reports cash and cash equivalents of 20,935 and short-term investments of 55,908; combined total is 76,843. MD&A identifies short-term investments as current, primarily highly liquid investment-grade fixed-income securities. The EV bridge would deduct 20,935 cash and 55,908 separately reported current securities once each. | 2026-06-30; USD millions | Supported; separately classified, with no cash overlap indicated by the balance-sheet presentation. |
+| Debt | Current portion of long-term debt 9,227 plus long-term debt 31,067 = 40,294. June 30, 2025 beginning debt would be current 2,999 plus long-term 40,152 = 43,151. | 2026-06-30 / 2025-06-30; USD millions | Supported by the comparative balance sheets. Lease liabilities are excluded. |
+| Operating current assets | Balance sheet: accounts receivable 80,876 + inventory 1,397 + other current assets 48,594. Separate cash 20,935 and short-term investments 55,908 are excluded. The Form 10-K MD&A, Liquidity and Capital Resources (p.57), says other current assets include $27,800 of supplier-related receivables; the Contract Balances and Other Receivables disclosure says financing receivables of $3,700 are in current and long-term assets, without giving their current portion. | 2026-06-30; USD millions | **Partly supported; total operating classification unresolved.** Current line items are sourced, but the $27,800 supplier receivable and other components of the $48,594 other-current-assets bucket have not been reconciled as operating vs financing/investing. Customer financing receivables are also not split between current and long-term. |
+| Operating current liabilities | Balance sheet components: AP 42,416 + accrued compensation 14,945 + short-term income taxes 2,534 + short-term unearned revenue 72,965 + other current liabilities 26,738; exclude current debt 9,227. Note 13 identifies 5,393 of “other current liabilities” as operating-lease liabilities. | 2026-06-30; USD millions | **Partly supported; total operating classification unresolved.** The disclosed operating-lease amount should be excluded from trade/operating NWC for a financing-neutral FCFF convention; the remaining 21,345 of other current liabilities is not fully broken down. Note 13 also says finance-lease obligations are included in other current liabilities without disclosing their current amount. |
+| Shares | Cover reports 7,425,545,491 common shares outstanding as of July 23, 2026; normalized value would be 7,425.545491 million shares. The July 23 count precedes the market date. | 2026-07-23; shares, proposed normalization to millions | Supported by SEC Form 10-K cover. This is not the weighted-average FY share count. |
+| Market price | October 16, 2026 close $529.05. | 2026-10-16; USD/share | Secondary-source fact, corroborated by multiple historical quote pages; no primary Nasdaq historical record was available in the reviewed page. |
+| Preferred equity and non-controlling interests | Balance sheet and stockholders' equity statement report common stock and paid-in capital, retained earnings, accumulated other comprehensive loss, and total stockholders' equity, without separate numeric preferred-equity or non-controlling-interest lines. Current Microsoft IR FAQ says it “no longer offers preferred shares.” | Financial statement date 2026-06-30; USD millions. FAQ accessed 2026-10-18, with no stated effective/reporting date. | **Preferred equity: partially supported, but June 30 numeric balance unresolved. NCI: unresolved.** The FAQ supports no current preferred offering but does not explicitly say no preferred shares were outstanding at June 30. Neither filing presentation nor FAQ supplies an explicit dated zero. No zero is inferred. No affirmative source for NCI balance or explicit statement that none exists was found. |
+| WACC evidence/default | No valuation-date risk-free yield, industry beta, and implied ERP package was assembled for this audit. Spec permits the 9.5% value only as an explicitly illustrative, editable fallback when evidence is incomplete. | Valuation date 2026-10-16; decimal rate | Would be labeled illustrative, never a Microsoft-specific estimate. This is not the gating evidence gap. |
+| Other defaults | Revenue growth 5% and terminal growth 2% are approved illustrative editable defaults. Historical EBIT/revenue is 155,237 / 331,839 and would be the historical-derived margin if the data gate otherwise passed. | FY ended 2026-06-30; decimal rates | Modeling conventions, not company facts. |
+
+## Follow-up investigation: required evidence and classification proposal
+
+The following evidence is from the same FY2026 Form 10-K (SEC accession 0001193125-26-323660, reporting date June 30, 2026) unless another source is named. The filing is available at the [SEC 10-K URL](https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm); source dates and units below are part of the evidence record, not production facts.
+
+### D&A — unresolved
+
+- **Required fact:** one complete FY2026 D&A amount, in USD millions, for the engine's D&A/revenue ratio, supported at a precision that can be represented honestly.
+- **Filing evidence:** Consolidated Cash Flows, “Depreciation, amortization, and other,” $38,534 million for year ended June 30, 2026. This is exact to USD millions but the caption explicitly includes “other”; it is not a pure D&A value.
+- **Component evidence:** Note 6, Property and Equipment, reports depreciation expense of $34.3 billion; Note 6, Intangible Assets, reports intangible asset amortization expense of $4.7 billion. Both prose disclosures round to USD 0.1 billion. Their sum, $39.0 billion, is a transparent approximate derived amount, not an exact filing fact; rounding means the true sum represented by those disclosures cannot be recovered exactly. The filing's $38.534 billion combined cash-flow adjustment differs by $466 million and does not identify which items account for the difference.
+- **Decision:** no D&A figure is promoted. The $39,000 million approximation may be suitable only if the project explicitly accepts and labels that rounding precision for this input; the current audit does not define an acceptable tolerance. The $38,534 million combined line must not be passed off as pure D&A. Until an exact pure amount or approved explicit approximation convention is available, `baseYear.da` is unsupported.
+
+### Final bounded evidence check — 2026-10-18
+
+- **Interest expense — resolved:** the [FY2026 SEC Form 10-K](https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm), Item 7, “Other income (expense), net” table (Note 3), reports interest expense of **$(3,051) million** for the year ended 2026-06-30. The sourced expense amount for the schema is positive magnitude **3,051 USD millions**, with the filing’s sign retained in source notes. This closes the required `baseYear.interestExpense` fact.
+- **Market-price check — date-matched secondary quote available; primary quote not obtained:** Nasdaq’s [MSFT Historical Quotes page](https://www.nasdaq.com/market-activity/stocks/msft/historical) was checked on 2026-10-18 and displayed “Data is currently not available”; it did not expose the 2026-10-16 close. Yahoo’s date-matched $529.05 close remains corroborated by [ChartExchange](https://chartexchange.com/symbol/nasdaq-msft/historical/), but this investigation did not obtain an exchange-published row. The current gate requires a sourced/date-matched price and does not validate source-publisher authority; whether to accept the secondary source is an audit policy decision, not a validation rule.
+- No new evidence was found that changes the prior D&A precision assessment, explicitly supports preferred equity or NCI at 2026-06-30, or reconciles the mixed components of current assets and current liabilities. Those gaps remain open.
+
+### Preferred equity and non-controlling interests — unresolved
+
+- **Required facts:** two separate, source-backed USD-million balances as of June 30, 2026. A numeric zero is acceptable only with an explicit dated source supporting no amount outstanding.
+- **Preferred equity evidence:** the SEC Form 10-K cover lists common stock and debt securities registered under Section 12(b), and the stockholders' equity statements show common stock and paid-in capital. Those disclosures do not by themselves prove preferred equity outstanding is zero. The Microsoft IR FAQ's “no longer offers preferred shares” answer is useful evidence of current issuance policy, but has no as-of/reporting date and does not explicitly say that the June 30 balance outstanding was zero.
+- **Non-controlling interest evidence:** the consolidated balance sheet and stockholders' equity statement do not give a separate NCI line or explicit zero. The filing consolidates subsidiaries (see Exhibit 21), but the reviewed report did not state a June 30 NCI amount or explicitly state that no NCI exists. Absence of a presented line is not treated as a zero balance.
+- **Decision:** neither fact is assigned zero. Preferred equity is only partially addressed by the undated FAQ; both dated numeric bridge values still need a source.
+
+### Operating NWC — classification proposal and remaining evidence
+
+The approved spec says operating NWC is operating current assets less operating current liabilities, excluding cash and interest-bearing debt. For a consistent financing-neutral FCFF definition, the proposed classification is:
+
+| Balance-sheet line at 2026-06-30 | USD millions | Proposed treatment and evidence |
+|---|---:|---|
+| Accounts receivable, net | 80,876 | Include: customer receivable line on the audited balance sheet. |
+| Inventories | 1,397 | Include: separately reported current operating asset. |
+| Other current assets | 48,594 | Do not include wholesale yet: Form 10-K MD&A, Liquidity and Capital Resources (p.57), says this includes $27,800 of supplier-related receivables; the Contract Balances and Other Receivables disclosure says $3,700 of customer financing receivables are in current and long-term assets but does not provide the current split. Other components are not fully itemized. These need classification/reconciliation. |
+| Cash and cash equivalents | 20,935 | Exclude: separately reported cash, also excluded from the EV-adjustment overlap issue. |
+| Short-term investments | 55,908 | Exclude: separately reported current investments; they are deducted separately in the reference EV bridge. |
+| Accounts payable | 42,416 | Include: operating supplier payable. |
+| Accrued compensation | 14,945 | Include: operating employee accrual. |
+| Short-term income taxes | 2,534 | Include provisionally as operating current liability; same-period balance-sheet line. |
+| Short-term unearned revenue | 72,965 | Include: customer contract liability from operations. |
+| Other current liabilities | 26,738 | Do not include wholesale yet: Note 3 identifies $5,393 as operating-lease liability within this caption; the same note states finance lease obligations also appear in other current liabilities but does not quantify the current amount. Remaining composition needs reconciliation. |
+| Current portion of long-term debt | 9,227 | Exclude: interest-bearing debt, separately reported. |
+
+The clearly classified subtotal is operating assets **82,273** (AR + inventory) less operating liabilities **132,860** (AP + accrued compensation + taxes + unearned revenue), yielding a **partial subtotal of -50,587 million**. This is not the complete operating NWC because other current assets and other current liabilities have material unresolved composition. The earlier candidate calculation of 130,867 less 159,598 is therefore withdrawn as an unverified total; it included mixed “other” captions and did not exclude the identified lease liability. No NWC amount is promoted.
+
+**Exact evidence needed to close the NWC gap:** a filing note or auditable reconciliation of the composition of the $48,594 other-current-assets line (including exact current supplier-related and customer financing receivable components and other material financial/non-operating items), plus a reconciliation of the $26,738 other-current-liabilities line separating lease financing obligations and other financing/non-operating items from operating obligations. The existing statements disclose some components but do not fully provide these splits.
+
+### Eligibility decision
+
+The runtime gate's `REQUIRED_FACTS` in `src/domain/company-data.ts` requires sourced `baseYear.da`, `baseYear.operatingCurrentAssets`, `baseYear.operatingCurrentLiabilities`, `latestBalanceSheet.preferredEquity`, and `latestBalanceSheet.nonControllingInterest`, among other facts. The specification additionally requires a source-backed complete audit, consistent dates/periods, and no cash/debt/security double count. The present source record does not support all five facts to the standard above.
+
+Microsoft therefore remains `candidate`; there is no `microsoft.json` or valuation output. Interest expense is now supported, but pure D&A precision, explicit date-matched preferred-equity and NCI balances, and complete operating current-asset/current-liability classifications remain unresolved. A date-matched secondary quote exists; the primary quote lookup was inconclusive, and the gate itself does not specify a source hierarchy. No code or model formula was changed. The current no-verified-company UI remains appropriate.

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "companies": [
+    {
+      "companyId": "microsoft",
+      "datasetPath": "microsoft.json",
+      "eligibility": "candidate",
+      "unavailableReason": "Audit research is documented, but Microsoft remains ineligible: the filing does not provide a sufficiently precise pure D&A fact for the base-year D&A input, and source-backed explicit zero facts for preferred equity and non-controlling interests have not been established. See microsoft-audit.md."
+    },
+    {
+      "companyId": "apple",
+      "datasetPath": "apple.json",
+      "eligibility": "candidate",
+      "unavailableReason": "The source-backed company audit has not been completed."
+    },
+    {
+      "companyId": "nvidia",
+      "datasetPath": "nvidia.json",
+      "eligibility": "candidate",
+      "unavailableReason": "The source-backed company audit has not been completed."
+    }
+  ]
+}

@@ -9,7 +9,7 @@ status: draft
 
 The dashboard is the control panel. A local, reviewed company-data file supplies the financial facts and their sources. A separate TypeScript calculation module checks those facts and user assumptions, projects five years of cash flow, and calculates enterprise value. In Reverse DCF mode, a numerical solver repeatedly calls that same calculation module to find the revenue growth rate that matches the fixed reference EV. The growth-versus-margin chart repeats that solve for each margin on its axis. Nothing fetches live prices, and no AI participates in the calculations.
 
-This design keeps the difficult financial logic in plain functions that can be tested without opening the dashboard. It also keeps the one-company path small enough to build and demonstrate locally. The dashboard can only select a company whose separate data audit has passed. A test-only fixture may exercise the math, but it must never appear as company data or in user-facing results.
+This design keeps the difficult financial logic in plain functions that can be tested without opening the dashboard. It also keeps the one-company path small enough to build and demonstrate locally. The verified-company dashboard can only select a company whose separate data audit has passed. If no company passes, a separate `/demo` route may use deterministic fictional inputs for education; it is not a company record and cannot enter or satisfy the verified-company gate. Test-only fixtures remain isolated from user-facing results.
 
 PRD refs: `prd.md > The Core Journey`; `prd.md > FCFF/WACC Valuation`; `prd.md > Reverse DCF Mode`; `prd.md > Growth-versus-Margin Equal-Value Chart`.
 
@@ -22,6 +22,7 @@ PRD refs: `prd.md > The Core Journey`; `prd.md > FCFF/WACC Valuation`; `prd.md >
 5. Each displayed forecast margin is sent through the same reverse solver and DCF engine. The chart receives a series of valid points and explicit unavailable points. It draws separate line segments across contiguous valid points, leaving no-root gaps open.
 6. Changing WACC, forecast margin, or terminal growth updates the assumption state and recomputes affected outputs. The reference EV stays fixed. Mode switches change growth-control behavior only and follow the PRD transfer rules.
 7. Selecting another verified company replaces company-specific source facts and defaults, preserves the current mode, shows the defaults-loaded notice, and recalculates. It never carries the previous company’s financial data into the new company context.
+8. When the verified-company list is empty, the home route keeps its existing unavailable state and may link to `/demo`. The separate demo route uses no real issuer name, ticker, market quote, source record, or source-verification claim. It persistently displays **FICTIONAL EDUCATIONAL EXAMPLE — NOT REAL MARKET DATA** and labels fictional inputs, user-selected assumptions, and calculated outputs separately. Its fictional baseline target is calculated with the shared DCF engine.
 
 ```text
 Curated manifest + company data ──> Dataset audit/validation ──> Dashboard context
@@ -56,7 +57,7 @@ The exact Node.js and dependency versions are to be checked and pinned during im
 - **Runtime:** browser UI served by the local Next.js development server. Requires a currently supported Node.js LTS version and npm; confirm the exact minimum in the installed Next.js release and record it in `package.json`/README.
 - **Start:** `npm install`, then `npm run dev`; open `http://localhost:3000`.
 - **Automated checks:** `npm test`; production compile check: `npm run build`.
-- **Demo recording:** run locally, open the dashboard, and record the one-minute sequence in `prd.md > The Core Journey`. If no company audit has passed, show the honest unavailable state rather than a fabricated demo dataset.
+- **Demo recording:** run locally, open the dashboard, and record the one-minute sequence in `prd.md > The Core Journey`. If no company audit has passed, show the honest unavailable home state and use the separate `/demo` route for the labeled fictional educational walkthrough.
 - **Sharing:** a short demo video and public GitHub repository are required for submission. Deployment is optional and not part of this spec; it does not replace either deliverable.
 
 ## Look and Feel
@@ -413,6 +414,7 @@ Automated tests are part of the implementation acceptance bar. Build them in the
 6. **Mode/company transitions:** shared assumptions and selected company survive mode changes; mode stays explicit; solver growth is read-only in Reverse; Forward growth is editable; transfer priority (last valid implied → last user value → company default) works; switching back recalculates; company selection loads its defaults, preserves mode, clears prior company inputs, and produces notice.
 7. **Company eligibility:** Microsoft, Apple, and NVIDIA remain unavailable in test data until evidence-backed audit records pass. Verify no incomplete data set appears in the selector and one verified company works without requiring other companies.
 8. **UI states:** test initial valid/default and unavailable states, valid reverse solution, no-root, invalid assumptions, solver failure, out-of-range historical-margin notice, forward valuation, source links/date labels, reference EV bridge, and responsive chart labels.
+9. **Educational demo isolation:** verify the fictional scenario is not a `CompanyDataset`, never appears in the production manifest or verified-company selector, and cannot satisfy the runtime eligibility gate. Verify the demo target and forward/reverse/chart outputs call the existing DCF, solver, and chart-series modules; verify the exact persistent warning and separate labels for fictional inputs, user assumptions, and calculated outputs. The home unavailable state remains present when the verified list is empty.
 
 Numerical tolerances and behavior are carried directly from `prd.md`; changing them requires PRD revision and approval before implementation.
 
@@ -423,6 +425,7 @@ valuation-stress-test/
 ├── app/
 │   ├── layout.tsx                  # Page shell, global styles, metadata
 │   ├── page.tsx                    # Dashboard route and initial data gate
+│   ├── demo/page.tsx                # Separate fictional educational route
 │   └── globals.css                 # Responsive terminal-style layout/tokens
 ├── components/
 │   ├── CompanyContext.tsx          # Selector, ticker, dates, source/reference EV
@@ -471,7 +474,7 @@ There are no runtime external services, API endpoints, keys, databases, or recur
 
 ## Important Failure Modes
 
-- **No company dataset passes audit** → show a clear unavailable dashboard with company/data explanation and reference layout only; do not show financial placeholders or test fixtures.
+- **No company dataset passes audit** → keep the main route in its clear unavailable state with no financial placeholders. The separate `/demo` route may show a deterministic fictional educational scenario with the persistent exact warning **FICTIONAL EDUCATIONAL EXAMPLE — NOT REAL MARKET DATA**. It has no real issuer, ticker, quote, source-verification claim, or manifest record; it distinguishes fictional inputs, user assumptions, and calculated outputs and reuses the approved DCF, solver, and chart functions. It cannot pass the company eligibility gate.
 - **Dataset missing a value, source, date, unit, classification, or date-consistent WACC evidence** → keep it out of the selector; explain the audit failure. Never fill from a second company or silently substitute an assumption for a sourced fact.
 - **Reverse solver has no valid solution or cannot classify the numeric result** → preserve reference/source information, show no-root only when absence is established, otherwise show numerical solver failure; leave chart gaps.
 - **User assumption is invalid** → retain independent reference context and identify the field/range; block affected outputs until corrected.
