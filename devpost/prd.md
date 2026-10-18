@@ -19,6 +19,10 @@ Source: `scope.md > The Unique Kernel`, `scope.md > Who It's For`, `scope.md > T
 6. Switch explicitly to Forward Valuation mode to set revenue growth directly. The fixed reference EV remains visible while modeled EV and estimated equity value per share update. Switch back to Reverse DCF to recalculate solver growth from the current assumptions.
 7. Select another verified company. Keep the selected mode, load the newly selected company's dated reference EV, source-backed inputs, and company-specific documented default assumptions, then recalculate. Show a concise notice that that company's defaults were loaded.
 
+When no real company passes eligibility, the home route stays in its company-data-unavailable state. It may link to a separate `/demo` educational route that runs a deterministic fictional scenario. That route is explicitly outside the verified-company selector and must keep the persistent label **FICTIONAL EDUCATIONAL EXAMPLE — NOT REAL MARKET DATA** visible. It has no real issuer, ticker, market quote, source links, or verification claim.
+
+The educational route distinguishes fictional scenario inputs, user-selected assumptions, and calculated outputs. It uses the existing DCF engine, reverse solver, and chart generator; its target EV is calculated from the fictional baseline inputs. The route does not create a company record and is never used to satisfy eligibility.
+
 Source: `scope.md > The Core Loop`, `scope.md > What "Working" Looks Like`, `scope.md > The POC Boundary`.
 
 ## Screens and Layout
@@ -54,6 +58,7 @@ Source: `scope.md > Inspiration & Identity`.
 Acceptance criteria:
 
 - Initial launch deterministically loads Microsoft only when its dataset passes the same completeness and validation rules as other companies; otherwise, show the explanatory unavailable state without financial placeholders.
+- If no eligible company is available, retain the unavailable state and provide a clearly separate link to `/demo`. The fictional example must never appear in the selector, company manifest, source-backed input list, or as a verified company.
 - Company selection loads the selected company's source data and documented defaults, keeps the current mode, recalculates outputs, and displays a visible notice. No prior company financial input appears in the newly loaded context.
 - Market-implied EV is labeled as derived and displays its formula inputs, share-count convention, and dates. Cash and eligible current short-term marketable securities are separately itemized, classified, sourced, and not double-counted. The same definition is used in the modeled equity bridge. Estimated per-share output includes the basic-share convention caveat.
 - Every sourced input shown has a source link, as-of/reporting date, and unit; assumptions and calculated outputs have different labels or visual treatment.
