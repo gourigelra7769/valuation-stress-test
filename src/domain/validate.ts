@@ -1,5 +1,23 @@
 import type { DcfInput, EquityBridgeInput, ValidationIssue } from "./types";
 
+const MARKETABLE_SECURITIES_OUTCOMES = [
+  "separately_reported_current",
+  "not_separately_reported",
+  "cannot_classify",
+] as const;
+
+export function isMarketableSecuritiesOutcome(value: unknown): value is typeof MARKETABLE_SECURITIES_OUTCOMES[number] {
+  return typeof value === "string" && MARKETABLE_SECURITIES_OUTCOMES.includes(value as typeof MARKETABLE_SECURITIES_OUTCOMES[number]);
+}
+
+function hasValidReviewEvidence(review: unknown): boolean {
+  if (typeof review !== "object" || review === null || Array.isArray(review)) return false;
+  const evidence = review as { note?: unknown; sourceIds?: unknown };
+  return typeof evidence.note === "string" && evidence.note.trim().length > 0 &&
+    Array.isArray(evidence.sourceIds) && evidence.sourceIds.length > 0 &&
+    evidence.sourceIds.every((id) => typeof id === "string" && id.trim().length > 0);
+}
+
 const isoDate = (value: string): boolean => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const parsed = new Date(`${value}T00:00:00Z`);
@@ -50,10 +68,12 @@ export function validateEquityBridgeInput(input: EquityBridgeInput): ValidationI
     issues.push({ field: "currentShortTermMarketableSecurities", code: "negative_amount", message: "Current short-term marketable securities cannot be negative." });
   }
   const review = input.marketableSecuritiesReview;
-  if (!review.note.trim() || !review.sourceIds.length || review.sourceIds.some((id) => !id.trim())) {
+  if (!hasValidReviewEvidence(review)) {
     issues.push({ field: "marketableSecuritiesReview", code: "missing_classification_evidence", message: "Marketable-security classification needs a note and source reference." });
   }
-  if (review.outcome === "cannot_classify") {
+  if (!isMarketableSecuritiesOutcome(review?.outcome)) {
+    issues.push({ field: "marketableSecuritiesReview.outcome", code: "unsupported_outcome", message: "Marketable-security review outcome is unsupported." });
+  } else if (review.outcome === "cannot_classify") {
     issues.push({ field: "currentShortTermMarketableSecurities", code: "unclassified_security", message: "Short-term marketable securities cannot be included until their current-asset classification is supported." });
   } else if (review.outcome === "separately_reported_current" && !input.currentShortTermMarketableSecurities) {
     issues.push({ field: "currentShortTermMarketableSecurities", code: "missing_input", message: "The review says separately reported current securities exist, but their amount is missing." });
@@ -106,6 +126,19 @@ export function validateDcfInput(input: DcfInput): ValidationIssue[] {
   const securities = bridge.currentShortTermMarketableSecurities?.value;
   if (securities !== undefined && !Number.isFinite(securities)) issues.push({ field: "equityBridge.currentShortTermMarketableSecurities", code: "non_finite", message: "Eligible current securities must be finite." });
   else if (securities !== undefined && securities < 0) issues.push({ field: "equityBridge.currentShortTermMarketableSecurities", code: "negative_amount", message: "Eligible current securities cannot be negative." });
+  const securitiesReview = bridge.marketableSecuritiesReview;
+  if (!hasValidReviewEvidence(securitiesReview)) {
+    issues.push({ field: "equityBridge.marketableSecuritiesReview", code: "missing_classification_evidence", message: "Marketable-security classification needs a note and source reference." });
+  }
+  if (!isMarketableSecuritiesOutcome(securitiesReview?.outcome)) {
+    issues.push({ field: "equityBridge.marketableSecuritiesReview.outcome", code: "unsupported_outcome", message: "Marketable-security review outcome is unsupported." });
+  } else if (securitiesReview.outcome === "cannot_classify") {
+    issues.push({ field: "equityBridge.currentShortTermMarketableSecurities", code: "unclassified_security", message: "Short-term marketable securities cannot be included until their current-asset classification is supported." });
+  } else if (securitiesReview.outcome === "separately_reported_current" && bridge.currentShortTermMarketableSecurities === undefined) {
+    issues.push({ field: "equityBridge.currentShortTermMarketableSecurities", code: "missing_input", message: "The review says separately reported current securities exist, but their amount is missing." });
+  } else if (securitiesReview.outcome === "not_separately_reported" && bridge.currentShortTermMarketableSecurities !== undefined) {
+    issues.push({ field: "equityBridge.currentShortTermMarketableSecurities", code: "classification_mismatch", message: "A security amount was supplied despite the review stating none is separately reported." });
+  }
   if (input.targetEv !== undefined && !Number.isFinite(input.targetEv)) issues.push({ field: "targetEv", code: "non_finite", message: "Target enterprise value must be finite when supplied." });
   for (const [field, value] of Object.entries(input.assumptions)) {
     if (!Number.isFinite(value)) issues.push({ field: `assumptions.${field}`, code: "non_finite", message: `${field} must be finite.` });

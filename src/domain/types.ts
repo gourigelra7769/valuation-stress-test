@@ -130,7 +130,8 @@ export type DcfInput = {
   operatingNwcToRevenue: number;
   equityBridge: Pick<EquityBridgeInput,
     "debt" | "preferredEquity" | "nonControllingInterest" |
-    "cashAndCashEquivalents" | "currentShortTermMarketableSecurities" | "basicShares">;
+    "cashAndCashEquivalents" | "currentShortTermMarketableSecurities" |
+    "marketableSecuritiesReview" | "basicShares">;
   assumptions: ModelAssumptions;
   targetEv?: number;
 };
@@ -155,6 +156,21 @@ export type DcfOutput = {
   presentValueTerminalValue: number;
   modeledEv: number;
   terminalValueContribution: number;
+  modeledEvToEquityBridge: {
+    startingModeledEnterpriseValue: number;
+    deductions: {
+      debt: number;
+      preferredEquity: number;
+      nonControllingInterest: number;
+    };
+    additions: {
+      cashAndCashEquivalents: number;
+      eligibleCurrentShortTermMarketableSecurities: number;
+    };
+    equityValueBeforeShares: number;
+    shareCount: { convention: "basic_common_shares"; value: number };
+    estimatedEquityValuePerShare: number;
+  };
   estimatedEquityValuePerShare: number;
 };
 

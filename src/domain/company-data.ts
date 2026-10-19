@@ -1,4 +1,5 @@
 import { calculateReferenceEv } from "./reference-ev";
+import { isMarketableSecuritiesOutcome } from "./validate";
 import type {
   CompanyDataset,
   CompanyManifest,
@@ -174,10 +175,18 @@ function validateDataset(datasetValue: unknown): { dataset?: CompanyDataset; iss
     issues.push(issue("latestBalanceSheet.reportingDate", "date_after_valuation", "Balance-sheet data must not follow the market-price valuation date."));
   }
 
+  const review = dataset.latestBalanceSheet?.marketableSecuritiesReview;
+  const reviewIsRecord = isRecord(review);
+  if (!reviewIsRecord || !isMarketableSecuritiesOutcome(review.outcome) || review.outcome === "cannot_classify" ||
+      !nonEmptyString(review.note) || !Array.isArray(review.sourceIds) || !review.sourceIds.length ||
+      review.sourceIds.some((id) => typeof id !== "string" || !sourceIds.has(id))) {
+    issues.push(issue("latestBalanceSheet.marketableSecuritiesReview", "invalid_security_review", "Marketable-security classification needs a resolved, source-backed review."));
+  }
+
   if (dataset.latestBalanceSheet?.currentShortTermMarketableSecurities) {
     validateFact(dataset.latestBalanceSheet.currentShortTermMarketableSecurities,
       "latestBalanceSheet.currentShortTermMarketableSecurities", USD, sourceIds, issues);
-    if (dataset.latestBalanceSheet.marketableSecuritiesReview.outcome !== "separately_reported_current") {
+    if (!reviewIsRecord || review.outcome !== "separately_reported_current") {
       issues.push(issue("latestBalanceSheet.currentShortTermMarketableSecurities", "classification_mismatch", "A securities amount requires separately_reported_current classification."));
     }
     if (dataset.latestBalanceSheet.currentShortTermMarketableSecurities.inclusionNote?.toLowerCase().includes("included in cash")) {
@@ -187,15 +196,10 @@ function validateDataset(datasetValue: unknown): { dataset?: CompanyDataset; iss
       issues.push(issue("latestBalanceSheet.currentShortTermMarketableSecurities.asOf", "date_mismatch", "Marketable securities must match the balance-sheet reporting date."));
     }
   }
-  const review = dataset.latestBalanceSheet?.marketableSecuritiesReview;
-  if (!review || review.outcome === "cannot_classify" || !review.note?.trim() || !review.sourceIds?.length ||
-      review.sourceIds.some((id) => !sourceIds.has(id))) {
-    issues.push(issue("latestBalanceSheet.marketableSecuritiesReview", "invalid_security_review", "Marketable-security classification needs a resolved, source-backed review."));
-  }
-  if (review?.outcome === "separately_reported_current" && !dataset.latestBalanceSheet.currentShortTermMarketableSecurities) {
+  if (reviewIsRecord && review.outcome === "separately_reported_current" && !dataset.latestBalanceSheet.currentShortTermMarketableSecurities) {
     issues.push(issue("latestBalanceSheet.currentShortTermMarketableSecurities", "missing_input", "Separately reported current securities require a sourced amount."));
   }
-  if (review?.outcome === "not_separately_reported" && dataset.latestBalanceSheet.currentShortTermMarketableSecurities) {
+  if (reviewIsRecord && review.outcome === "not_separately_reported" && dataset.latestBalanceSheet.currentShortTermMarketableSecurities) {
     issues.push(issue("latestBalanceSheet.currentShortTermMarketableSecurities", "classification_mismatch", "No amount is expected when no separate security is reported."));
   }
 
@@ -311,6 +315,7 @@ export function loadSelectableCompanies(
         nonControllingInterest: dataset.latestBalanceSheet.nonControllingInterest,
         cashAndCashEquivalents: dataset.latestBalanceSheet.cashAndCashEquivalents,
         currentShortTermMarketableSecurities: dataset.latestBalanceSheet.currentShortTermMarketableSecurities,
+        marketableSecuritiesReview: dataset.latestBalanceSheet.marketableSecuritiesReview,
         basicShares: dataset.marketReference.basicShares,
       },
       assumptions: {

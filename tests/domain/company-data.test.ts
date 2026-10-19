@@ -76,4 +76,56 @@ describe("company audit eligibility gate", () => {
     expect(loaded.companies).toHaveLength(0);
     expect(loaded.rejected[0].issues.map((item) => item.code)).toContain("cash_overlap");
   });
+
+  it("rejects an unsupported marketable-security review outcome at the dataset boundary", () => {
+    const dataset = syntheticCompanyDataset();
+    (dataset.latestBalanceSheet.marketableSecuritiesReview as { outcome: string }).outcome = "unknown";
+    const loaded = loadSelectableCompanies(syntheticManifest([syntheticVerifiedEntry()]), { "synthetic-co.json": dataset });
+    expect(loaded.companies).toHaveLength(0);
+    expect(loaded.rejected[0].issues.map((item) => item.code)).toContain("invalid_security_review");
+  });
+
+  it("rejects a missing marketable-security review without throwing when an amount is present", () => {
+    const dataset = syntheticCompanyDataset();
+    dataset.latestBalanceSheet.currentShortTermMarketableSecurities = {
+      value: 10,
+      unit: "USD_millions",
+      asOf: dataset.latestBalanceSheet.reportingDate,
+      sourceIds: ["synthetic-source"],
+    };
+    delete (dataset.latestBalanceSheet as Partial<typeof dataset.latestBalanceSheet>).marketableSecuritiesReview;
+
+    expect(() => loadSelectableCompanies(syntheticManifest([syntheticVerifiedEntry()]), {
+      "synthetic-co.json": dataset,
+    })).not.toThrow();
+    const loaded = loadSelectableCompanies(syntheticManifest([syntheticVerifiedEntry()]), {
+      "synthetic-co.json": dataset,
+    });
+    expect(loaded.companies).toHaveLength(0);
+    expect(loaded.rejected[0].issues.map((item) => item.code)).toEqual(expect.arrayContaining([
+      "invalid_security_review", "classification_mismatch",
+    ]));
+  });
+
+  it("rejects malformed marketable-security review values without throwing when an amount is present", () => {
+    const dataset = syntheticCompanyDataset();
+    dataset.latestBalanceSheet.currentShortTermMarketableSecurities = {
+      value: 10,
+      unit: "USD_millions",
+      asOf: dataset.latestBalanceSheet.reportingDate,
+      sourceIds: ["synthetic-source"],
+    };
+    (dataset.latestBalanceSheet as unknown as { marketableSecuritiesReview: unknown }).marketableSecuritiesReview = null;
+
+    expect(() => loadSelectableCompanies(syntheticManifest([syntheticVerifiedEntry()]), {
+      "synthetic-co.json": dataset,
+    })).not.toThrow();
+    const loaded = loadSelectableCompanies(syntheticManifest([syntheticVerifiedEntry()]), {
+      "synthetic-co.json": dataset,
+    });
+    expect(loaded.companies).toHaveLength(0);
+    expect(loaded.rejected[0].issues.map((item) => item.code)).toEqual(expect.arrayContaining([
+      "invalid_security_review", "classification_mismatch",
+    ]));
+  });
 });
