@@ -21,6 +21,13 @@ describe("educational demo dashboard", () => {
     expect(screen.getByRole("img", { name: /revenue growth required/i })).toBeTruthy();
     await waitFor(() => expect(screen.getByTestId("demo-modeled-ev").textContent).not.toBe("Unavailable"));
     const forecastPanel = screen.getByTestId("forecast-panel");
+    fireEvent.click(within(forecastPanel).getByText("Inputs and calculation notes"));
+    const initialNotes = within(forecastPanel).getByTestId("forecast-notes");
+    expect(initialNotes.textContent).toContain("Fictional educational inputs only — not real company data");
+    expect(initialNotes.textContent).toContain("fictional baseline assumption (editable by the user)");
+    expect(initialNotes.textContent).toContain("Revenue: base revenue $1,000.0000m × (1 + revenue growth 8.00%)");
+    expect(initialNotes.textContent).toContain("real source provenance and effective dates are unavailable");
+    expect(initialNotes.querySelectorAll("a")).toHaveLength(0);
     for (let year = 1; year <= 5; year += 1) expect(within(forecastPanel).getByRole("columnheader", { name: `Year ${year}` })).toBeTruthy();
     expect(within(forecastPanel).getByRole("rowheader", { name: "Revenue" })).toBeTruthy();
     expect(within(forecastPanel).getByRole("rowheader", { name: "FCFF" })).toBeTruthy();
@@ -33,16 +40,28 @@ describe("educational demo dashboard", () => {
     expect(container.querySelectorAll(".curve-point").length).toBeGreaterThan(0);
 
     fireEvent.click(screen.getByRole("button", { name: "Forward Valuation" }));
+    const carriedPanel = screen.getByTestId("forecast-panel");
+    fireEvent.click(within(carriedPanel).getByText("Inputs and calculation notes"));
+    expect(within(carriedPanel).getByTestId("forecast-notes").textContent).toContain("solver-derived by Reverse DCF and carried into Forward Valuation");
+    fireEvent.click(within(carriedPanel).getByText("Inputs and calculation notes"));
     const growth = screen.getByRole("spinbutton", { name: "Revenue growth" }) as HTMLInputElement;
     expect(growth.disabled).toBe(false);
     fireEvent.change(growth, { target: { value: "12" } });
     expect(growth.value).toBe("12");
     expect(screen.getByTestId("demo-growth").textContent).toBe("12.00%");
     expect(screen.getByTestId("demo-modeled-ev").textContent).not.toBe("Unavailable");
+    const forwardPanel = screen.getByTestId("forecast-panel");
+    fireEvent.click(within(forwardPanel).getByText("Inputs and calculation notes"));
+    expect(within(forwardPanel).getByTestId("forecast-notes").textContent).toContain("revenue growth 12.00%");
+    expect(within(forwardPanel).getByTestId("forecast-notes").textContent).toContain("Fictional educational inputs only");
+    expect(within(forwardPanel).getByTestId("forecast-notes").textContent).toContain("Revenue growth: 12.00% — fictional, user-selected assumption");
 
     fireEvent.click(screen.getByRole("button", { name: "Reverse DCF" }));
     await waitFor(() => expect(screen.getByTestId("demo-growth").textContent).not.toBe("12.00%"));
     expect(screen.getByRole("note", { name: "Fictional educational data warning" }).textContent).toBe(FICTIONAL_DEMO_WARNING);
+    const reversePanel = screen.getByTestId("forecast-panel");
+    fireEvent.click(within(reversePanel).getByText("Inputs and calculation notes"));
+    expect(within(reversePanel).getByTestId("forecast-notes").textContent).toContain(`Revenue growth: ${screen.getByTestId("demo-growth").textContent} — solver-derived`);
   }, 20000);
 
   it("blocks calculated output for invalid assumptions while retaining the fictional target", () => {

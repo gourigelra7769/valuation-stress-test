@@ -31,6 +31,14 @@ describe("dashboard integration", () => {
     expect(screen.getByTestId("reference-ev").textContent).toContain("$1,005.0m");
     await waitFor(() => expect(screen.getByTestId("modeled-ev").textContent).not.toBe("Unavailable"));
     const forecastPanel = screen.getByTestId("forecast-panel");
+    const reverseGrowth = screen.getByTestId("growth-result").textContent ?? "";
+    fireEvent.click(within(forecastPanel).getByText("Inputs and calculation notes"));
+    const notes = within(forecastPanel).getByTestId("forecast-notes");
+    expect(notes.textContent).toContain(`Revenue growth: ${reverseGrowth} — solver-derived for this Reverse DCF result`);
+    expect(notes.textContent).toContain("solver-derived for this Reverse DCF result");
+    expect(notes.textContent).toContain("Taxes: EBIT × effective tax rate 20.00%");
+    expect(notes.textContent).toContain("Year 1 compares with base-year revenue $1,000.0000m");
+    expect(notes.querySelector('a[href="https://example.test/source"]')).toBeTruthy();
     expect(within(forecastPanel).getByText("Current model output is displayed in USD millions.")).toBeTruthy();
     for (let year = 1; year <= 5; year += 1) expect(within(forecastPanel).getByRole("columnheader", { name: `Year ${year}` })).toBeTruthy();
     expect(within(forecastPanel).getByRole("rowheader", { name: "Revenue" })).toBeTruthy();
@@ -50,16 +58,26 @@ describe("dashboard integration", () => {
     const displayedAmount = (testId: string) => Number(within(forecastPanel).getByTestId(testId).textContent?.replace(/[$,m]/g, ""));
     expect(displayedAmount("forecast-pv-subtotal") + displayedAmount("forecast-pv-terminal"))
       .toBeCloseTo(displayedAmount("forecast-modeled-ev"), 3);
-    const reverseGrowth = screen.getByTestId("growth-result").textContent ?? "";
     expect((screen.getByRole("spinbutton", { name: /Revenue growth/ }) as HTMLInputElement).value).toBe(reverseGrowth.replace("%", ""));
     expect(screen.getByRole("img", { name: /revenue growth required/i })).toBeTruthy();
     expect(container.querySelectorAll(".curve-point").length).toBeGreaterThan(1);
     fireEvent.click(screen.getByRole("button", { name: "Forward Valuation" }));
+    const carriedPanel = screen.getByTestId("forecast-panel");
+    fireEvent.click(within(carriedPanel).getByText("Inputs and calculation notes"));
+    expect(within(carriedPanel).getByTestId("forecast-notes").textContent).toContain("solver-derived by Reverse DCF and carried into Forward Valuation");
+    fireEvent.click(within(carriedPanel).getByText("Inputs and calculation notes"));
     const growth = screen.getByRole("spinbutton", { name: /Revenue growth/ }) as HTMLInputElement;
     fireEvent.change(growth, { target: { value: "8" } });
     expect(growth.value).toBe("8");
     expect(screen.getByTestId("growth-result").textContent).toBe("8.00%");
     expect(screen.getByTestId("modeled-ev").textContent).not.toBe("Unavailable");
+    const forwardPanel = screen.getByTestId("forecast-panel");
+    fireEvent.click(within(forwardPanel).getByText("Inputs and calculation notes"));
+    expect(within(forwardPanel).getByTestId("forecast-notes").textContent).toContain("Revenue: base revenue $1,000.0000m × (1 + revenue growth 8.00%)");
+    expect(within(forwardPanel).getByTestId("forecast-notes").textContent).toContain("Revenue growth: 8.00% — user-edited assumption");
+    fireEvent.change(growth, { target: { value: "5" } });
+    expect(within(forwardPanel).getByTestId("forecast-notes").textContent).toContain("Revenue growth: 5.00% — user-edited assumption");
+    expect(within(forwardPanel).getByTestId("forecast-notes").textContent).toContain("Default reference: 5.00%");
 
     fireEvent.click(screen.getByRole("button", { name: "Reverse DCF" }));
     await waitFor(() => expect(screen.getByTestId("growth-result").textContent).not.toBe("8.00%"));
@@ -105,5 +123,22 @@ describe("dashboard integration", () => {
     expect(screen.getByText("Synthetic beta")).toBeTruthy();
     expect(screen.getByText("Reference EV bridge")).toBeTruthy();
     expect(within(screen.getByText("Source-backed company inputs").closest("section")!).getByText("120")).toBeTruthy();
-  });
+  }, 15000);
+
+  it("does not invent source links or missing assumption rationale and method", () => {
+    const verifiedFixture = company();
+    // Simulate absent records after fixture validation to exercise the UI's defensive provenance rendering.
+    verifiedFixture.dataset.sources = [];
+    verifiedFixture.dataset.defaults.wacc.method = "";
+    verifiedFixture.dataset.defaults.wacc.rationale = "";
+    render(<DashboardClient companies={[verifiedFixture]} />);
+    fireEvent.click(screen.getByRole("button", { name: "Forward Valuation" }));
+    fireEvent.change(screen.getByRole("spinbutton", { name: /WACC/ }), { target: { value: "11" } });
+    const panel = screen.getByTestId("forecast-panel");
+    fireEvent.click(within(panel).getByText("Inputs and calculation notes"));
+    const notes = within(panel).getByTestId("forecast-notes");
+    expect(notes.textContent).toContain("Default reference: 9.50%; its method (unavailable in the company record) and rationale (unavailable in the company record)");
+    expect(notes.textContent).toContain("source link unavailable in the company record");
+    expect(notes.querySelectorAll("a")).toHaveLength(0);
+  }, 15000);
 });
