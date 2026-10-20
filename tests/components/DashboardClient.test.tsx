@@ -30,6 +30,26 @@ describe("dashboard integration", () => {
     expect((screen.getByRole("spinbutton", { name: /Revenue growth/ }) as HTMLInputElement).disabled).toBe(true);
     expect(screen.getByTestId("reference-ev").textContent).toContain("$1,005.0m");
     await waitFor(() => expect(screen.getByTestId("modeled-ev").textContent).not.toBe("Unavailable"));
+    const forecastPanel = screen.getByTestId("forecast-panel");
+    expect(within(forecastPanel).getByText("Current model output is displayed in USD millions.")).toBeTruthy();
+    for (let year = 1; year <= 5; year += 1) expect(within(forecastPanel).getByRole("columnheader", { name: `Year ${year}` })).toBeTruthy();
+    expect(within(forecastPanel).getByRole("rowheader", { name: "Revenue" })).toBeTruthy();
+    const revenueRow = within(forecastPanel).getByRole("rowheader", { name: "Revenue" }).closest("tr");
+    expect(revenueRow?.querySelectorAll("td")).toHaveLength(5);
+    expect(revenueRow?.querySelector("td")?.textContent).toMatch(/^\$[\d,.]+m$/);
+    for (const label of ["EBIT", "Taxes", "D&A", "CapEx", "FCFF", "Discount factor"]) {
+      expect(within(forecastPanel).getByRole("rowheader", { name: label })).toBeTruthy();
+    }
+    expect(within(forecastPanel).getByRole("rowheader", { name: "Change in operating net working capital" })).toBeTruthy();
+    expect(within(forecastPanel).getByRole("rowheader", { name: "Present value of FCFF" })).toBeTruthy();
+    expect(within(forecastPanel).getByTestId("forecast-pv-subtotal").textContent).toMatch(/^\$[\d,.]+m$/);
+    expect(within(forecastPanel).getByTestId("forecast-terminal-value").textContent).toMatch(/^\$[\d,.]+m$/);
+    expect(within(forecastPanel).getByTestId("forecast-pv-terminal").textContent).toMatch(/^\$[\d,.]+m$/);
+    expect(within(forecastPanel).getByText(/sum of the present values of the five forecast FCFFs plus the present value of terminal value/i)).toBeTruthy();
+    expect(within(forecastPanel).getByText(/terminal value at year 5 is undiscounted and shown for reference; it is not added directly to this subtotal/i)).toBeTruthy();
+    const displayedAmount = (testId: string) => Number(within(forecastPanel).getByTestId(testId).textContent?.replace(/[$,m]/g, ""));
+    expect(displayedAmount("forecast-pv-subtotal") + displayedAmount("forecast-pv-terminal"))
+      .toBeCloseTo(displayedAmount("forecast-modeled-ev"), 3);
     const reverseGrowth = screen.getByTestId("growth-result").textContent ?? "";
     expect((screen.getByRole("spinbutton", { name: /Revenue growth/ }) as HTMLInputElement).value).toBe(reverseGrowth.replace("%", ""));
     expect(screen.getByRole("img", { name: /revenue growth required/i })).toBeTruthy();
@@ -52,6 +72,7 @@ describe("dashboard integration", () => {
     fireEvent.change(screen.getByRole("spinbutton", { name: /WACC/ }), { target: { value: "4" } });
     expect(screen.getByRole("alert").textContent).toMatch(/invalid assumptions/i);
     expect(screen.getByTestId("modeled-ev").textContent).toBe("Unavailable");
+    expect(screen.queryByTestId("forecast-panel")).toBeNull();
     expect(screen.getByTestId("reference-ev").textContent).toContain("$1,005.0m");
   });
 
@@ -61,6 +82,7 @@ describe("dashboard integration", () => {
     render(<DashboardClient companies={[highTarget]} />);
     expect(screen.getByRole("status").textContent).toMatch(/No valid growth solution/);
     expect(screen.getByTestId("modeled-ev").textContent).toBe("Unavailable");
+    expect(screen.queryByTestId("forecast-panel")).toBeNull();
   });
 
   it("distinguishes a numerically inconclusive reverse solve from a confirmed no-root result", () => {

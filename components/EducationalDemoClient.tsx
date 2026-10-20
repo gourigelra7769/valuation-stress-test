@@ -14,6 +14,7 @@ import {
   FICTIONAL_INPUT_SUMMARY,
 } from "../src/demo/fictional-scenario";
 import { EqualValueChart } from "./EqualValueChart";
+import { ForecastPanel } from "./ForecastPanel";
 
 type Mode = "reverse" | "forward";
 type Field = keyof ModelAssumptions;
@@ -101,6 +102,7 @@ export function EducationalDemoClient() {
       </div>
       <section className="detail-grid demo-details"><article className="panel"><p className="eyebrow">Calculated outputs</p><h2>Model results</h2><div className="metric-list"><div><span>Estimated equity value per share</span><strong>{output ? `$${output.estimatedEquityValuePerShare.toFixed(2)}` : "Unavailable"}</strong></div><div><span>Terminal value contribution</span><strong>{output ? percent(output.terminalValueContribution) : "Unavailable"}</strong></div><div><span>Terminal value at year five</span><strong>{output ? money(output.terminalValueAtYear5) : "Unavailable"}</strong></div><div><span>Discounted terminal value</span><strong>{output ? money(output.presentValueTerminalValue) : "Unavailable"}</strong></div></div><p className="fine-print">These are calculated outputs from fictional inputs and the shared DCF engine, not a forecast or investment advice.</p></article>
         <article className="panel"><p className="eyebrow">Calculation provenance</p><h2>Shared financial engine</h2><p className="muted">Reverse DCF calls the existing deterministic growth solver. Forward Valuation and the fixed teaching target call the same five-year FCFF/WACC DCF engine. Every chart point uses the existing solver with the same fixed fictional target.</p><p className="muted">The demo has no company dataset, source records, market reference date, issuer identity, or quote.</p></article></section>
+      {output && <ForecastPanel output={output} />}
       <footer className="demo-footer">{FICTIONAL_DEMO_WARNING}<br />No real company data · No investment recommendation</footer>
     </main>
   </>;
