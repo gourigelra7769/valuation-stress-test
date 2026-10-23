@@ -32,6 +32,11 @@ export const FICTIONAL_DEMO_INPUT: DcfInput = {
     preferredEquity: fictionalAmount(0),
     nonControllingInterest: fictionalAmount(0),
     cashAndCashEquivalents: fictionalAmount(220),
+    marketableSecuritiesReview: {
+      outcome: "not_separately_reported",
+      sourceIds: ["fictional-example"],
+      note: "Fictional scenario assumption: no separate current short-term securities.",
+    },
     basicShares: {
       value: 25,
       unit: "shares_millions",

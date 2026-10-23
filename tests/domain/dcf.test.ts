@@ -23,9 +23,46 @@ describe("five-year FCFF/WACC DCF", () => {
     expectClose(result.value.modeledEv, independentlyCalculatedDcf.modeledEv);
     expectClose(result.value.terminalValueContribution, independentlyCalculatedDcf.terminalValueContribution);
     expectClose(result.value.estimatedEquityValuePerShare, independentlyCalculatedDcf.estimatedEquityValuePerShare);
+    const bridge = result.value.modeledEvToEquityBridge;
+    expect(bridge.startingModeledEnterpriseValue).toBe(result.value.modeledEv);
+    expect(bridge.deductions).toEqual({ debt: 20, preferredEquity: 2, nonControllingInterest: 3 });
+    expect(bridge.additions).toEqual({ cashAndCashEquivalents: 15, eligibleCurrentShortTermMarketableSecurities: 5 });
+    expect(bridge.shareCount).toEqual({ convention: "basic_common_shares", value: 10 });
+    expectClose(bridge.equityValueBeforeShares, result.value.modeledEv - 20 - 2 - 3 + 15 + 5);
+    expectClose(bridge.equityValueBeforeShares, bridge.estimatedEquityValuePerShare * bridge.shareCount.value);
+    expectClose(bridge.estimatedEquityValuePerShare, independentlyCalculatedDcf.estimatedEquityValuePerShare);
+    expectClose(bridge.estimatedEquityValuePerShare, result.value.estimatedEquityValuePerShare);
     expectClose(result.value.modeledEv,
       result.value.forecast.reduce((sum, row) => sum + row.presentValueFcff, 0) + result.value.presentValueTerminalValue);
     expectClose(result.value.terminalValueContribution, result.value.presentValueTerminalValue / result.value.modeledEv);
+  });
+
+  it("requires review support for omitted securities and applies only reviewed bridge adjustments", () => {
+    const omitted = dcfFixture();
+    omitted.equityBridge.currentShortTermMarketableSecurities = undefined;
+    omitted.equityBridge.marketableSecuritiesReview = {
+      outcome: "not_separately_reported",
+      sourceIds: ["test-only"],
+      note: "Synthetic test evidence says no separate current securities are reported.",
+    };
+    const omittedResult = calculateDcf(omitted);
+    expect(omittedResult.status).toBe("valid");
+    if (omittedResult.status !== "valid") return;
+    const omittedBridge = omittedResult.value.modeledEvToEquityBridge;
+    expect(omittedBridge.additions.eligibleCurrentShortTermMarketableSecurities).toBe(0);
+    expectClose(omittedBridge.equityValueBeforeShares,
+      omittedResult.value.modeledEv - 20 - 2 - 3 + 15);
+    expectClose(omittedBridge.estimatedEquityValuePerShare,
+      omittedBridge.equityValueBeforeShares / omittedBridge.shareCount.value);
+
+    const ambiguous = dcfFixture();
+    ambiguous.equityBridge.currentShortTermMarketableSecurities = undefined;
+    delete (ambiguous.equityBridge as Partial<typeof ambiguous.equityBridge>).marketableSecuritiesReview;
+    expect(calculateDcf(ambiguous)).toMatchObject({ status: "invalid_input" });
+
+    const supplied = dcfFixture();
+    expect(supplied.equityBridge.currentShortTermMarketableSecurities?.value).toBe(5);
+    expect(calculateDcf(supplied)).toMatchObject({ status: "valid" });
   });
 
   it("is deterministic and returns finite outputs", () => {
@@ -38,6 +75,9 @@ describe("five-year FCFF/WACC DCF", () => {
       ...first.value.forecast.flatMap((row) => Object.values(row)),
       first.value.terminalValueAtYear5, first.value.presentValueTerminalValue,
       first.value.modeledEv, first.value.terminalValueContribution,
+      first.value.modeledEvToEquityBridge.startingModeledEnterpriseValue,
+      first.value.modeledEvToEquityBridge.equityValueBeforeShares,
+      first.value.modeledEvToEquityBridge.estimatedEquityValuePerShare,
       first.value.estimatedEquityValuePerShare,
     ];
     expect(allNumbers.every(Number.isFinite)).toBe(true);

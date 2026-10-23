@@ -14,6 +14,7 @@ import {
   FICTIONAL_INPUT_SUMMARY,
 } from "../src/demo/fictional-scenario";
 import { EqualValueChart } from "./EqualValueChart";
+import { ForecastPanel } from "./ForecastPanel";
 
 type Mode = "reverse" | "forward";
 type Field = keyof ModelAssumptions;
@@ -31,6 +32,9 @@ function AssumptionControl({ id, label, field, value, onChange, disabled = false
 
 export function EducationalDemoClient() {
   const [mode, setMode] = useState<Mode>("reverse");
+  const [growthEdited, setGrowthEdited] = useState(false);
+  const [growthCarriedFromReverse, setGrowthCarriedFromReverse] = useState(false);
+  const [editedAssumptions, setEditedAssumptions] = useState<Partial<Record<Field, boolean>>>({});
   const [assumptions, setAssumptions] = useState<ModelAssumptions>({ ...FICTIONAL_BASELINE_ASSUMPTIONS });
   const modelInput = useMemo(() => ({
     ...FICTIONAL_DEMO_INPUT,
@@ -51,9 +55,13 @@ export function EducationalDemoClient() {
   const activeGrowth = mode === "reverse"
     ? reverse?.status === "solved" ? reverse.growth : undefined
     : assumptions.revenueGrowth;
+  const displayedDcfInput = activeGrowth === undefined ? null : {
+    ...modelInput,
+    assumptions: { ...assumptions, revenueGrowth: activeGrowth },
+  };
   const calculation = mode === "reverse"
-    ? activeGrowth === undefined ? null : calculateDcf({ ...modelInput, assumptions: { ...assumptions, revenueGrowth: activeGrowth } })
-    : validationIssues.length === 0 ? calculateDcf(modelInput) : null;
+    ? displayedDcfInput ? calculateDcf(displayedDcfInput) : null
+    : validationIssues.length === 0 && displayedDcfInput ? calculateDcf(displayedDcfInput) : null;
   const output = calculation?.status === "valid" ? calculation.value : null;
   const chart = useMemo(() => generateEqualValueChartSeries({
     ...FICTIONAL_DEMO_INPUT,
@@ -65,11 +73,21 @@ export function EducationalDemoClient() {
   }, FICTIONAL_DEMO_TARGET_EV), [assumptions]);
 
   function update(field: Field, value: number) {
+    if (field === "revenueGrowth") {
+      setGrowthEdited(true);
+      setGrowthCarriedFromReverse(false);
+    }
+    setEditedAssumptions((current) => ({ ...current, [field]: true }));
     setAssumptions((current) => ({ ...current, [field]: value }));
   }
   function switchMode(next: Mode) {
     if (next === "forward" && mode === "reverse" && reverse?.status === "solved") {
       setAssumptions((current) => ({ ...current, revenueGrowth: reverse.growth }));
+      setGrowthEdited(false);
+      setGrowthCarriedFromReverse(true);
+      setEditedAssumptions((current) => ({ ...current, revenueGrowth: false }));
+    } else if (next === "forward") {
+      setGrowthCarriedFromReverse(false);
     }
     setMode(next);
   }
@@ -101,6 +119,7 @@ export function EducationalDemoClient() {
       </div>
       <section className="detail-grid demo-details"><article className="panel"><p className="eyebrow">Calculated outputs</p><h2>Model results</h2><div className="metric-list"><div><span>Estimated equity value per share</span><strong>{output ? `$${output.estimatedEquityValuePerShare.toFixed(2)}` : "Unavailable"}</strong></div><div><span>Terminal value contribution</span><strong>{output ? percent(output.terminalValueContribution) : "Unavailable"}</strong></div><div><span>Terminal value at year five</span><strong>{output ? money(output.terminalValueAtYear5) : "Unavailable"}</strong></div><div><span>Discounted terminal value</span><strong>{output ? money(output.presentValueTerminalValue) : "Unavailable"}</strong></div></div><p className="fine-print">These are calculated outputs from fictional inputs and the shared DCF engine, not a forecast or investment advice.</p></article>
         <article className="panel"><p className="eyebrow">Calculation provenance</p><h2>Shared financial engine</h2><p className="muted">Reverse DCF calls the existing deterministic growth solver. Forward Valuation and the fixed teaching target call the same five-year FCFF/WACC DCF engine. Every chart point uses the existing solver with the same fixed fictional target.</p><p className="muted">The demo has no company dataset, source records, market reference date, issuer identity, or quote.</p></article></section>
+      {output && displayedDcfInput && <ForecastPanel output={output} input={displayedDcfInput} fictional solverDerivedGrowth={mode === "reverse" ? "reverse" : growthCarriedFromReverse && !growthEdited ? "carried" : false} userEditedAssumptions={editedAssumptions} />}
       <footer className="demo-footer">{FICTIONAL_DEMO_WARNING}<br />No real company data · No investment recommendation</footer>
     </main>
   </>;

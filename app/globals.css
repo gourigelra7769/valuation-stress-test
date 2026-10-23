@@ -7,3 +7,164 @@
 .demo-entry-link{margin:24px 0 0;font-size:13px;font-weight:700}.demo-entry-link a{display:inline-block;padding:10px 14px;border:1px solid #c6d8d5;border-radius:7px;background:#f3faf8;color:#205c58;text-decoration:none}.demo-entry-link a:hover{background:#e5f2f0;text-decoration:underline}
 @media(max-width:850px){.demo-input-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.demo-main-grid{grid-template-columns:1fr}.demo-main-grid .assumptions-panel{display:grid;grid-template-columns:1fr 1fr;column-gap:15px}.demo-main-grid .assumptions-panel .panel-heading{grid-column:1/-1}}
 @media(max-width:600px){.demo-warning{padding:10px 12px;font-size:10px;line-height:1.35;letter-spacing:.015em}.demo-shell{padding-top:13px}.demo-input-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.demo-input{padding:9px}.demo-input span{font-size:9px}.demo-input strong{font-size:12px}.demo-section-label{align-items:flex-start;line-height:1.35}.demo-context{align-items:flex-start}.demo-main-grid .assumptions-panel{display:block}.demo-footer{font-size:10px;padding:12px 7px}}
+.forecast-panel{padding:18px;margin:14px 0}.forecast-table-scroll{width:100%;overflow-x:auto}.forecast-table{width:100%;min-width:760px;border-collapse:collapse;font-size:10px;font-variant-numeric:tabular-nums}.forecast-table th,.forecast-table td{padding:8px 9px;border-top:1px solid #edf0f2;text-align:right;white-space:nowrap}.forecast-table thead th{color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.05em}.forecast-table th:first-child{text-align:left}.forecast-table tbody th{font-weight:600}.forecast-reconciliation-heading{font:600 14px Georgia,serif;margin:18px 0 5px}.forecast-reconciliation>div{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #edf0f2;font-size:11px}.forecast-reconciliation strong{font-variant-numeric:tabular-nums;white-space:nowrap}.forecast-ev-total{font-weight:700;color:var(--calc);border-bottom:0!important}.forecast-panel .fine-print{margin-top:8px}
+.forecast-notes{margin-top:16px;border:1px solid var(--line);border-radius:8px;background:#fbfcfc;padding:10px 12px}.forecast-notes summary{cursor:pointer;font-size:11px;font-weight:700;color:var(--navy)}.forecast-notes summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}.forecast-notes[open] summary{margin-bottom:10px}.forecast-notes .fictional-note{color:#713421;font-weight:650}.forecast-notes-subheading{font:600 12px Georgia,serif;margin:15px 0 4px}.forecast-formulas,.forecast-provenance{margin:7px 0 0;padding-left:20px;font-size:10px}.forecast-formulas li,.forecast-provenance li{padding:3px 0}.forecast-provenance a{color:var(--calc);text-decoration:underline;text-underline-offset:2px}.fictional-provenance{border-left:3px solid #efcdb9;padding-left:22px}
+
+/* Phase 1 overview hierarchy */
+body{font-size:15px;line-height:1.55}
+.shell{padding-top:32px}
+.topbar{gap:16px;margin-bottom:26px}
+.brand-mark{width:44px;height:44px;font-size:23px}
+.topbar h1{font-size:25px;line-height:1.25}
+.eyebrow{font-size:11px;letter-spacing:.1em}
+.company-strip{padding:21px 24px;margin-bottom:16px}
+.company-strip h2{font-size:22px}
+.company-strip h2 span{font-size:14px}
+.muted{font-size:14px}
+.company-select{font-size:12px}
+.company-select select{font-size:14px;min-height:44px}
+.mode-row{gap:6px;margin:16px 0 18px}
+.mode-button{min-height:44px;padding:10px 16px;font-size:14px}
+.mode-explainer{font-size:13px}
+.valuation-summary{grid-template-columns:1.2fr 1fr 1fr;gap:14px;margin-bottom:18px}
+.result-card{padding:19px 21px;min-height:122px}
+.result-card-primary{border-color:#c5d9d7;background:linear-gradient(135deg,#fff 0%,#f7fbfa 100%)}
+.hero-number{font-size:36px}
+.result-number{font-size:27px}
+.result-caption{font-size:12px;line-height:1.45;margin-top:6px}
+.main-grid,.detail-grid{gap:16px;margin:18px 0}
+.assumptions-panel,.chart-panel,.detail-grid>.panel{padding:21px}
+.panel-heading h2,.detail-grid h2,.source-panel h2{font-size:20px}
+.control{gap:7px;padding:14px 0}
+.control>span,.fixed-assumption>span{font-size:14px}
+.input-wrap input{min-height:44px;padding:10px}
+.input-wrap>span{font-size:14px}
+.control small,.fixed-assumption small,.solver-range{font-size:12px}
+.metric-list>div,.bridge-line,.bridge-total{font-size:13px;padding:10px 0}
+.fine-print{font-size:12px;line-height:1.5}
+.tag{font-size:10px}
+.state-message{font-size:13px;padding:13px 16px}
+.empty-state{padding:52px 48px}
+.empty-icon{width:48px;height:48px;font-size:24px}
+.empty-state h2{font-size:29px}
+.empty-state>p:not(.eyebrow){font-size:15px;line-height:1.6}
+.empty-checklist{font-size:12px;gap:10px 18px}
+.empty-checklist span{padding:8px 11px}
+.demo-input span{font-size:12px}
+.demo-input strong{font-size:14px}
+@media(max-width:850px){.valuation-summary{grid-template-columns:1fr 1fr}.result-card-primary{grid-column:1/-1}}
+@media(max-width:600px){.shell{padding:17px 14px}.topbar{align-items:flex-start;gap:12px}.brand-mark{flex:0 0 40px;width:40px;height:40px}.topbar h1{font-size:21px}.company-strip{padding:17px}.company-strip h2{font-size:20px}.valuation-summary{grid-template-columns:1fr;gap:10px}.result-card-primary{grid-column:auto}.result-card{min-height:0;padding:16px 18px}.hero-number{font-size:32px}.result-number{font-size:24px}.result-caption{font-size:12px}.assumptions-panel,.chart-panel,.detail-grid>.panel{padding:17px}.empty-state{padding:36px 22px}.empty-state h2{font-size:24px}.empty-checklist{font-size:11px}.mode-button{padding:9px 12px}}
+
+/* Phase 2 forecast readability */
+.forecast-panel{min-width:0;max-width:100%;padding:22px;margin:18px 0}
+.forecast-table-scroll{width:100%;max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-gutter:stable;}
+.forecast-table-scroll:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.forecast-table{width:100%;min-width:1050px;table-layout:fixed;border-collapse:collapse;font-size:14px;line-height:1.45;font-variant-numeric:tabular-nums}
+.forecast-table th,.forecast-table td{padding:11px 13px;border-top:1px solid #e7ecef;text-align:right;white-space:nowrap}
+.forecast-table thead th{padding-top:12px;padding-bottom:12px;background:#f5f8f8;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.035em;text-transform:none}
+.forecast-table th:first-child{width:310px;text-align:left}
+.forecast-table tbody th{font-weight:600;white-space:normal}
+.forecast-table tbody tr:nth-child(even){background:#fbfcfc}
+.forecast-table .forecast-fcff-row{border-top:2px solid #b9cecc;background:#f2f8f7;font-weight:700}
+.forecast-table .forecast-pv-row{background:#f7f9fa;font-weight:650}
+.forecast-table .forecast-fcff-row th,.forecast-table .forecast-pv-row th{color:var(--navy)}
+.forecast-notes{margin-top:20px;padding:0 16px;border-radius:9px}
+.forecast-notes summary{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:52px;padding:11px 0;font-size:15px;line-height:1.4}
+.forecast-notes summary:focus-visible{outline-offset:4px}
+.forecast-notes-hint{color:var(--muted);font-size:12px;font-weight:500}
+.forecast-notes[open] summary{margin-bottom:0;border-bottom:1px solid var(--line)}
+.forecast-notes>p,.forecast-notes>h3,.forecast-notes>.forecast-formula-groups,.forecast-notes>ul{margin-left:0;margin-right:0}
+.forecast-formula-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px;margin-top:16px}
+.forecast-formula-group{min-width:0;padding:12px 0 15px;border-bottom:1px solid #e7ecef}
+.forecast-formula-group h3,.forecast-notes-subheading{margin:0 0 7px;color:var(--navy);font:650 15px/1.4 Inter,ui-sans-serif,system-ui,sans-serif}
+.forecast-formulas,.forecast-provenance{margin:0;padding-left:21px;font-size:13px;line-height:1.55}
+.forecast-formulas li,.forecast-provenance li{padding:4px 0}
+.forecast-notes-subheading{margin-top:20px}
+.forecast-notes .fine-print{font-size:13px;line-height:1.55}
+.forecast-provenance a{overflow-wrap:anywhere}
+.forecast-reconciliation-panel{margin-top:20px;padding:17px 20px 15px;border:1px solid var(--line);border-radius:10px;background:#f8fafb}
+.forecast-reconciliation-heading{margin:0;color:var(--navy);font:650 19px/1.35 Georgia,serif}
+.forecast-reconciliation-intro{margin:5px 0 8px;color:var(--muted);font-size:13px}
+.forecast-reconciliation>div{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px;padding:11px 0;border-bottom:1px solid #e2e8eb;font-size:14px;line-height:1.4}
+.forecast-reconciliation>div>span{min-width:0}
+.forecast-reconciliation strong{font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.forecast-reconciliation small{display:block;margin-top:2px;color:var(--muted);font-size:12px;font-weight:500}
+.forecast-reconciliation .forecast-pv-terminal-row{background:#f1f6f6}
+.forecast-reconciliation .forecast-ev-total{margin:4px -10px 0;padding:13px 10px;border:0!important;border-radius:6px;background:#eaf3f2;color:var(--navy);font-size:15px}
+.forecast-reconciliation .forecast-ev-total strong{color:var(--calc);font-size:18px}
+.forecast-reconciliation-panel>.fine-print{margin-top:10px}
+@media(max-width:850px){.forecast-panel{padding:19px}.forecast-table{min-width:1050px}.forecast-table th:first-child{width:300px}.forecast-formula-groups{gap:0 18px}}
+@media(max-width:600px){.forecast-panel{padding:15px;margin:14px 0}.forecast-panel>.panel-heading{gap:8px}.forecast-panel>.panel-heading h2{font-size:19px}.forecast-table-scroll{margin-right:-2px}.forecast-table{min-width:1020px;font-size:13px}.forecast-table th,.forecast-table td{padding:10px 11px}.forecast-table th:first-child{width:290px}.forecast-table thead th{font-size:12px}.forecast-notes{padding:0 12px}.forecast-notes summary{align-items:flex-start;flex-direction:column;justify-content:center;gap:2px;min-height:58px;font-size:14px}.forecast-notes-hint{font-size:12px}.forecast-formula-groups{grid-template-columns:minmax(0,1fr);margin-top:8px}.forecast-formula-group{padding:12px 0}.forecast-formula-group h3,.forecast-notes-subheading{font-size:14px}.forecast-formulas,.forecast-provenance,.forecast-notes .fine-print{font-size:12px}.forecast-reconciliation-panel{padding:14px 12px}.forecast-reconciliation-heading{font-size:18px}.forecast-reconciliation>div{grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px 0;font-size:13px}.forecast-reconciliation strong{font-size:13px}.forecast-reconciliation .forecast-ev-total strong{font-size:16px}.forecast-reconciliation small{font-size:11px}}
+
+/* Shared typography and readability pass */
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.6}
+button,input,select{font:inherit}
+.topbar h1{font-size:30px;line-height:1.25}
+.company-strip h2{font-size:24px;line-height:1.3}
+.company-strip h2 span{font-size:14px}
+.panel-heading h2,.detail-grid h2,.source-panel h2,.demo-details h2{font-size:22px;line-height:1.35}
+.eyebrow{font-size:13px;letter-spacing:.075em;line-height:1.4}
+.topbar-tag{font-size:13px}
+.company-strip .muted,.muted{font-size:15px;line-height:1.55}
+.company-select{font-size:14px}
+.company-select select{font-size:15px}
+.mode-button{font-size:15px}
+.mode-explainer{font-size:14px}
+.hero-number{font-size:36px}
+.result-number{font-size:30px}
+.result-caption{font-size:14px;line-height:1.5}
+.tag{font-size:12px;letter-spacing:.04em}
+.control>span,.fixed-assumption>span{font-size:15px}
+.input-wrap input,.input-wrap>span,.fixed-assumption input{font-size:15px;line-height:1.4}
+.control small,.fixed-assumption small,.solver-range{font-size:13px;line-height:1.5}
+.metric-list>div,.bridge-line,.bridge-total{font-size:15px;line-height:1.5}
+.fine-print{font-size:14px;line-height:1.6}
+.state-message{font-size:15px;line-height:1.55}
+.empty-state h2{font-size:30px;line-height:1.3}
+.empty-checklist{font-size:13px}
+.demo-warning{font-size:14px;line-height:1.5}
+.demo-section-label{font-size:14px;line-height:1.5}
+.demo-input span{font-size:13px;line-height:1.45}
+.demo-input strong{font-size:15px}
+.source-row{font-size:13px;line-height:1.5}
+.source-row small{font-size:12px}
+.source-header{font-size:12px}
+.chart-target,.chart-legend,.unavailable-details{font-size:13px}
+.axis-label,.axis-title{font-size:12px}
+.forecast-table{min-width:1120px;font-size:15px;line-height:1.5}
+.forecast-table th:first-child{width:320px}
+.forecast-table th,.forecast-table td{padding:12px 14px}
+.forecast-table thead th{font-size:14px}
+.forecast-notes summary{font-size:17px;line-height:1.5}
+.forecast-notes-hint{font-size:14px}
+.forecast-formula-group h3,.forecast-notes-subheading{font-size:17px;line-height:1.45}
+.forecast-formulas,.forecast-provenance{font-size:16px;line-height:1.6}
+.forecast-formulas li,.forecast-provenance li{padding:5px 0}
+.forecast-notes .fine-print{font-size:15px;line-height:1.6}
+.forecast-reconciliation-heading{font-size:22px;line-height:1.4}
+.forecast-reconciliation-intro{font-size:15px;line-height:1.5}
+.forecast-reconciliation>div{font-size:16px;line-height:1.5;padding:12px 0}
+.forecast-reconciliation strong{font-size:15px}
+.forecast-reconciliation small{font-size:13px;line-height:1.45}
+.forecast-reconciliation .forecast-ev-total{font-size:17px}
+.forecast-reconciliation .forecast-ev-total strong{font-size:20px}
+.forecast-reconciliation-panel>.fine-print{font-size:14px;line-height:1.55}
+@media(max-width:850px){.topbar h1{font-size:28px}.company-strip h2{font-size:22px}.panel-heading h2,.detail-grid h2,.source-panel h2,.demo-details h2{font-size:21px}.hero-number{font-size:34px}.result-number{font-size:28px}.forecast-table{min-width:1120px}.forecast-table th:first-child{width:310px}}
+@media(max-width:600px){body{font-size:16px}.topbar h1{font-size:26px}.company-strip h2{font-size:21px}.panel-heading h2,.detail-grid h2,.source-panel h2,.demo-details h2{font-size:20px}.eyebrow{font-size:12px}.hero-number{font-size:32px}.result-number{font-size:27px}.result-caption{font-size:14px}.mode-button{font-size:14px}.demo-warning{font-size:13px;line-height:1.45}.source-row{font-size:13px}.source-header{font-size:12px}.axis-label,.axis-title{font-size:11px}.forecast-panel>.panel-heading h2{font-size:20px}.forecast-table{min-width:1120px;font-size:14px}.forecast-table th,.forecast-table td{padding:11px 12px}.forecast-table th:first-child{width:300px}.forecast-table thead th{font-size:13px}.forecast-notes summary{font-size:16px}.forecast-notes-hint{font-size:13px}.forecast-formula-group h3,.forecast-notes-subheading{font-size:16px}.forecast-formulas,.forecast-provenance,.forecast-notes .fine-print{font-size:14px;line-height:1.55}.forecast-reconciliation-heading{font-size:20px}.forecast-reconciliation-intro{font-size:14px}.forecast-reconciliation>div{font-size:14px}.forecast-reconciliation strong{font-size:14px}.forecast-reconciliation small{font-size:12px}.forecast-reconciliation .forecast-ev-total{font-size:16px}.forecast-reconciliation .forecast-ev-total strong{font-size:18px}.forecast-reconciliation-panel>.fine-print{font-size:13px}}
+
+/* Final demo metric and formula readability polish */
+.demo-input-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:9px}
+.demo-input{padding:10px 13px}
+.demo-input span{font-size:12px;line-height:1.35;font-weight:600}
+.demo-input strong{margin-top:3px;font-size:17px;line-height:1.25;font-weight:700}
+.forecast-formulas li{min-width:0;overflow-wrap:anywhere;line-height:1.65}
+.forecast-formulas sup{font-size:.72em;line-height:0;vertical-align:super;white-space:nowrap}
+.forecast-formula-group:last-child .forecast-formulas li{padding-top:7px;padding-bottom:7px}
+.forecast-notes-subheading{margin-top:24px;padding-top:14px;border-top:1px solid #e2e8eb}
+.forecast-notes-subheading+.fine-print{margin-top:8px}
+.forecast-notes-subheading+.fine-print+.forecast-provenance,.forecast-notes-subheading+.forecast-provenance{margin-top:12px}
+.forecast-provenance{padding:8px 12px 8px 30px;border:1px solid #e6ebed;border-radius:7px;background:#fff}
+.forecast-provenance li{padding:6px 5px}
+.forecast-provenance li+li{border-top:1px solid #f0f2f3}
+.fictional-provenance{border-left:3px solid #efcdb9;background:#fffaf7;padding-left:29px}
+@media(max-width:600px){.demo-input-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.demo-input{padding:9px 10px}.demo-input span{font-size:11px}.demo-input strong{font-size:16px}.forecast-formulas li{line-height:1.6}.forecast-provenance{padding:7px 8px 7px 25px}.fictional-provenance{padding-left:24px}}

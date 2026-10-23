@@ -14,6 +14,11 @@ export const dcfFixture = (): DcfInput => ({
     nonControllingInterest: { value: 3, unit: "USD_millions", asOf: "2025-12-30", sourceIds: ["test-only"] },
     cashAndCashEquivalents: { value: 15, unit: "USD_millions", asOf: "2025-12-30", sourceIds: ["test-only"] },
     currentShortTermMarketableSecurities: { value: 5, unit: "USD_millions", asOf: "2025-12-30", sourceIds: ["test-only"] },
+    marketableSecuritiesReview: {
+      outcome: "separately_reported_current",
+      sourceIds: ["test-only"],
+      note: "Synthetic test evidence says securities are separate current assets.",
+    },
     basicShares: { value: 10, unit: "shares_millions", asOf: "2025-12-30", sourceIds: ["test-only"] },
   },
   assumptions: {

@@ -53,9 +53,24 @@ export function calculateDcf(input: DcfInput): DcfCalculation {
   const terminalValueContribution = presentValueTerminalValue / modeledEv;
   const bridge = input.equityBridge;
   const eligibleSecurities = bridge.currentShortTermMarketableSecurities?.value ?? 0;
-  const estimatedEquityValuePerShare = (modeledEv - bridge.debt.value - bridge.preferredEquity.value -
-    bridge.nonControllingInterest.value + bridge.cashAndCashEquivalents.value + eligibleSecurities) /
-    bridge.basicShares.value;
+  const equityValueBeforeShares = modeledEv - bridge.debt.value - bridge.preferredEquity.value -
+    bridge.nonControllingInterest.value + bridge.cashAndCashEquivalents.value + eligibleSecurities;
+  const estimatedEquityValuePerShare = equityValueBeforeShares / bridge.basicShares.value;
+  const modeledEvToEquityBridge = {
+    startingModeledEnterpriseValue: modeledEv,
+    deductions: {
+      debt: bridge.debt.value,
+      preferredEquity: bridge.preferredEquity.value,
+      nonControllingInterest: bridge.nonControllingInterest.value,
+    },
+    additions: {
+      cashAndCashEquivalents: bridge.cashAndCashEquivalents.value,
+      eligibleCurrentShortTermMarketableSecurities: eligibleSecurities,
+    },
+    equityValueBeforeShares,
+    shareCount: { convention: "basic_common_shares" as const, value: bridge.basicShares.value },
+    estimatedEquityValuePerShare,
+  };
 
   const output: DcfOutput = {
     forecast,
@@ -63,6 +78,7 @@ export function calculateDcf(input: DcfInput): DcfCalculation {
     presentValueTerminalValue,
     modeledEv,
     terminalValueContribution,
+    modeledEvToEquityBridge,
     estimatedEquityValuePerShare,
   };
   const numericOutputs = [

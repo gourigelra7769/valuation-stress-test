@@ -62,4 +62,40 @@ describe("reference EV and equity bridge", () => {
     future.balanceSheetDate = "2026-01-01";
     expect(calculateReferenceEv(future)).toMatchObject({ status: "invalid_input" });
   });
+
+  it("rejects malformed review outcomes and evidence without throwing", () => {
+    const unsupported = validBridgeInput();
+    (unsupported.marketableSecuritiesReview as { outcome: string }).outcome = "unknown";
+    expect(calculateReferenceEv(unsupported)).toMatchObject({
+      status: "invalid_input",
+      issues: expect.arrayContaining([expect.objectContaining({ code: "unsupported_outcome" })]),
+    });
+
+    const malformedEvidence = validBridgeInput();
+    (malformedEvidence.marketableSecuritiesReview as { sourceIds: unknown }).sourceIds = "not-an-array";
+    expect(() => calculateReferenceEv(malformedEvidence)).not.toThrow();
+    expect(calculateReferenceEv(malformedEvidence)).toMatchObject({ status: "invalid_input" });
+
+    const bothInvalid = validBridgeInput();
+    (bothInvalid.marketableSecuritiesReview as { outcome: string; note: string }).outcome = "unknown";
+    (bothInvalid.marketableSecuritiesReview as { sourceIds: unknown }).sourceIds = "not-an-array";
+    const result = calculateReferenceEv(bothInvalid);
+    expect(result).toMatchObject({ status: "invalid_input" });
+    if (result.status === "invalid_input") {
+      expect(result.issues.map((issue) => issue.code)).toEqual(expect.arrayContaining([
+        "missing_classification_evidence", "unsupported_outcome",
+      ]));
+    }
+  });
+
+  it("accepts a sourced zero amount for separately reported current securities", () => {
+    const input = validBridgeInput();
+    input.currentShortTermMarketableSecurities!.value = 0;
+    const result = calculateReferenceEv(input);
+    expect(result.status).toBe("valid");
+    if (result.status === "valid") {
+      expect(result.value.adjustments.eligibleCurrentShortTermMarketableSecurities).toBe(0);
+      expect(result.value.referenceEv).toBe(1010);
+    }
+  });
 });
