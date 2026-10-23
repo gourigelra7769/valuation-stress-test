@@ -93,28 +93,41 @@ export function ForecastPanel({ output, input, company, fictional = false, solve
   return <section className="panel forecast-panel" aria-labelledby="forecast-heading" data-testid="forecast-panel">
     <div className="panel-heading"><div><p className="eyebrow">Calculated outputs</p><h2 id="forecast-heading">Five-year FCFF forecast</h2></div><span className="tag sourced-tag">Shared DCF output</span></div>
     <p className="fine-print">Current model output is displayed in USD millions.</p>
-    <div className="forecast-table-scroll"><table className="forecast-table"><thead><tr><th scope="col">USD millions</th>{output.forecast.map((year) => <th scope="col" key={year.year}>Year {year.year}</th>)}</tr></thead><tbody>{rows.map((row) => <tr key={row.label}><th scope="row">{row.label}</th>{output.forecast.map((year, index) => <td key={year.year}>{row.value(index)}</td>)}</tr>)}</tbody></table></div>
+    <div className="forecast-table-scroll" role="region" aria-label="Scrollable five-year FCFF forecast table" tabIndex={0}>
+      <table className="forecast-table">
+        <thead><tr><th scope="col">USD millions</th>{output.forecast.map((year) => <th scope="col" key={year.year}>Year {year.year}</th>)}</tr></thead>
+        <tbody>{rows.map((row) => <tr className={row.label === "FCFF" ? "forecast-fcff-row" : row.label === "Present value of FCFF" ? "forecast-pv-row" : undefined} key={row.label}><th scope="row">{row.label}</th>{output.forecast.map((year, index) => <td key={year.year}>{row.value(index)}</td>)}</tr>)}</tbody>
+      </table>
+    </div>
     <details className="forecast-notes" data-testid="forecast-notes">
-      <summary>Inputs and calculation notes</summary>
+      <summary><span>Inputs and calculation notes</span><span className="forecast-notes-hint">Formulas, assumptions, and provenance</span></summary>
       {fictional && <p className="fine-print fictional-note">Fictional educational inputs only — not real company data. The baseline and assumptions below are invented; user changes are scenario assumptions.</p>}
       {company
         ? <p className="fine-print">Base-year values are historical company inputs; all five year columns are forecast outputs.</p>
         : <p className="fine-print">Baseline values are fictional scenario inputs, not historical issuer facts; all five year columns are forecast outputs.</p>}
-      <ul className="forecast-formulas">
-        <li><strong>Revenue:</strong> base revenue {amount(input.baseRevenue)} × (1 + revenue growth {percent(input.assumptions.revenueGrowth)})<sup>forecast year</sup>.</li>
-        <li><strong>EBIT:</strong> revenue × forecast operating margin {percent(input.assumptions.forecastOperatingMargin)}.</li>
-        <li><strong>Taxes:</strong> EBIT × effective tax rate {percent(input.effectiveTaxRate)}.</li>
-        <li><strong>D&amp;A:</strong> revenue × D&amp;A-to-revenue ratio {percent(input.daToRevenue)}.</li>
-        <li><strong>CapEx:</strong> revenue × CapEx-to-revenue ratio {percent(input.capexToRevenue)}.</li>
-        <li><strong>Operating NWC:</strong> revenue × operating-NWC-to-revenue ratio {percent(input.operatingNwcToRevenue)}.</li>
-        <li><strong>Change in NWC:</strong> current-year operating NWC − prior-year operating NWC. Year 1 compares with base-year revenue {amount(input.baseRevenue)} using the same operating-NWC ratio.</li>
-        <li><strong>FCFF:</strong> EBIT − taxes + D&amp;A − CapEx − change in NWC.</li>
-        <li><strong>Discount factor:</strong> 1 / (1 + WACC {percent(input.assumptions.wacc)})<sup>forecast year</sup>.</li>
-        <li><strong>Present value of FCFF:</strong> FCFF × discount factor.</li>
-        <li><strong>Terminal value:</strong> Year 5 FCFF × (1 + terminal growth {percent(input.assumptions.terminalGrowth)}) / (WACC {percent(input.assumptions.wacc)} − terminal growth {percent(input.assumptions.terminalGrowth)}).</li>
-        <li><strong>Present value of terminal value:</strong> terminal value / (1 + WACC {percent(input.assumptions.wacc)})<sup>5</sup>.</li>
-        <li><strong>Modeled EV:</strong> sum of the five FCFF present values + present value of terminal value.</li>
-      </ul>
+      <div className="forecast-formula-groups">
+        <section className="forecast-formula-group"><h3>Revenue and operating assumptions</h3><ul className="forecast-formulas">
+          <li><strong>Revenue:</strong> base revenue {amount(input.baseRevenue)} × (1 + revenue growth {percent(input.assumptions.revenueGrowth)})<sup>forecast year</sup>.</li>
+          <li><strong>EBIT:</strong> revenue × forecast operating margin {percent(input.assumptions.forecastOperatingMargin)}.</li>
+          <li><strong>Taxes:</strong> EBIT × effective tax rate {percent(input.effectiveTaxRate)}.</li>
+          <li><strong>D&amp;A:</strong> revenue × D&amp;A-to-revenue ratio {percent(input.daToRevenue)}.</li>
+          <li><strong>CapEx:</strong> revenue × CapEx-to-revenue ratio {percent(input.capexToRevenue)}.</li>
+          <li><strong>Operating NWC:</strong> revenue × operating-NWC-to-revenue ratio {percent(input.operatingNwcToRevenue)}.</li>
+        </ul></section>
+        <section className="forecast-formula-group"><h3>FCFF construction</h3><ul className="forecast-formulas">
+          <li><strong>Change in NWC:</strong> current-year operating NWC − prior-year operating NWC. Year 1 compares with base-year revenue {amount(input.baseRevenue)} using the same operating-NWC ratio.</li>
+          <li><strong>FCFF:</strong> EBIT − taxes + D&amp;A − CapEx − change in NWC.</li>
+        </ul></section>
+        <section className="forecast-formula-group"><h3>Discounting</h3><ul className="forecast-formulas">
+          <li><strong>Discount factor:</strong> 1 / (1 + WACC {percent(input.assumptions.wacc)})<sup>forecast year</sup>.</li>
+          <li><strong>Present value of FCFF:</strong> FCFF × discount factor.</li>
+        </ul></section>
+        <section className="forecast-formula-group"><h3>Terminal value and enterprise value</h3><ul className="forecast-formulas">
+          <li><strong>Terminal value:</strong> Year 5 FCFF × (1 + terminal growth {percent(input.assumptions.terminalGrowth)}) / (WACC {percent(input.assumptions.wacc)} − terminal growth {percent(input.assumptions.terminalGrowth)}).</li>
+          <li><strong>Present value of terminal value:</strong> terminal value / (1 + WACC {percent(input.assumptions.wacc)})<sup>5</sup>.</li>
+          <li><strong>Modeled EV:</strong> sum of the five FCFF present values + present value of terminal value.</li>
+        </ul></section>
+      </div>
       <h3 className="forecast-notes-subheading">Input status and provenance</h3>
       {company ? <>
         <p className="fine-print">Historical fact dates and sources below are shown only where recorded. Derived ratios use these base-year facts; their source records support the underlying facts, not the modeling choice to hold each ratio constant in the forecast.</p>
@@ -142,13 +155,16 @@ export function ForecastPanel({ output, input, company, fictional = false, solve
         <AssumptionNote name="terminalGrowth" label="Terminal growth" value={input.assumptions.terminalGrowth} userEdited={userEditedAssumptions.terminalGrowth} />
       </ul>}
     </details>
-    <h3 className="forecast-reconciliation-heading">Enterprise-value reconciliation</h3>
-    <div className="forecast-reconciliation" aria-label="Enterprise-value reconciliation">
-      <div><span>Sum of present values of forecast FCFF</span><strong data-testid="forecast-pv-subtotal">{amount(forecastPv)}</strong></div>
-      <div><span>Terminal value at Year 5</span><strong data-testid="forecast-terminal-value">{amount(output.terminalValueAtYear5)}</strong></div>
-      <div><span>Present value of terminal value</span><strong data-testid="forecast-pv-terminal">{amount(output.presentValueTerminalValue)}</strong></div>
-      <div className="forecast-ev-total"><span>Modeled enterprise value</span><strong data-testid="forecast-modeled-ev">{amount(output.modeledEv)}</strong></div>
-    </div>
-    <p className="fine-print">Modeled enterprise value equals the sum of the present values of the five forecast FCFFs plus the present value of terminal value. Terminal value at Year 5 is undiscounted and shown for reference; it is not added directly to this subtotal. Amounts are shown to four decimal places; underlying values retain full precision.</p>
+    <section className="forecast-reconciliation-panel" aria-labelledby="forecast-reconciliation-heading">
+      <h3 className="forecast-reconciliation-heading" id="forecast-reconciliation-heading">Enterprise-value reconciliation</h3>
+      <p className="forecast-reconciliation-intro">Modeled EV includes the present value of terminal value.</p>
+      <div className="forecast-reconciliation" aria-label="Enterprise-value reconciliation">
+        <div><span>Sum of present values of forecast FCFF</span><strong data-testid="forecast-pv-subtotal">{amount(forecastPv)}</strong></div>
+        <div><span>Terminal value at Year 5 <small>Undiscounted; reference only</small></span><strong data-testid="forecast-terminal-value">{amount(output.terminalValueAtYear5)}</strong></div>
+        <div className="forecast-pv-terminal-row"><span>Present value of terminal value</span><strong data-testid="forecast-pv-terminal">{amount(output.presentValueTerminalValue)}</strong></div>
+        <div className="forecast-ev-total"><span>Modeled enterprise value</span><strong data-testid="forecast-modeled-ev">{amount(output.modeledEv)}</strong></div>
+      </div>
+      <p className="fine-print">Modeled enterprise value equals the sum of the present values of the five forecast FCFFs plus the present value of terminal value. Terminal value at Year 5 is undiscounted and shown for reference; it is not added directly to this subtotal. Amounts are shown to four decimal places; underlying values retain full precision.</p>
+    </section>
   </section>;
 }

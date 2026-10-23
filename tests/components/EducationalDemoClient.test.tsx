@@ -21,12 +21,17 @@ describe("educational demo dashboard", () => {
     expect(screen.getByRole("img", { name: /revenue growth required/i })).toBeTruthy();
     await waitFor(() => expect(screen.getByTestId("demo-modeled-ev").textContent).not.toBe("Unavailable"));
     const forecastPanel = screen.getByTestId("forecast-panel");
+    expect(within(forecastPanel).getByRole("region", { name: "Scrollable five-year FCFF forecast table" }).getAttribute("tabindex")).toBe("0");
+    const initialNotes = within(forecastPanel).getByTestId("forecast-notes") as HTMLDetailsElement;
+    expect(initialNotes.open).toBe(false);
     fireEvent.click(within(forecastPanel).getByText("Inputs and calculation notes"));
-    const initialNotes = within(forecastPanel).getByTestId("forecast-notes");
+    expect(initialNotes.open).toBe(true);
     expect(initialNotes.textContent).toContain("Fictional educational inputs only — not real company data");
     expect(initialNotes.textContent).toContain("fictional baseline assumption (editable by the user)");
     expect(initialNotes.textContent).toContain("Revenue: base revenue $1,000.0000m × (1 + revenue growth 8.00%)");
     expect(initialNotes.textContent).toContain("real source provenance and effective dates are unavailable");
+    expect(within(initialNotes).getByRole("heading", { name: "FCFF construction" })).toBeTruthy();
+    expect(within(forecastPanel).getByText("Modeled EV includes the present value of terminal value.")).toBeTruthy();
     expect(initialNotes.querySelectorAll("a")).toHaveLength(0);
     for (let year = 1; year <= 5; year += 1) expect(within(forecastPanel).getByRole("columnheader", { name: `Year ${year}` })).toBeTruthy();
     expect(within(forecastPanel).getByRole("rowheader", { name: "Revenue" })).toBeTruthy();

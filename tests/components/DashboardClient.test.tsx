@@ -32,12 +32,19 @@ describe("dashboard integration", () => {
     await waitFor(() => expect(screen.getByTestId("modeled-ev").textContent).not.toBe("Unavailable"));
     const forecastPanel = screen.getByTestId("forecast-panel");
     const reverseGrowth = screen.getByTestId("growth-result").textContent ?? "";
+    const tableRegion = within(forecastPanel).getByRole("region", { name: "Scrollable five-year FCFF forecast table" });
+    expect(tableRegion.getAttribute("tabindex")).toBe("0");
+    const notes = within(forecastPanel).getByTestId("forecast-notes") as HTMLDetailsElement;
+    expect(notes.open).toBe(false);
     fireEvent.click(within(forecastPanel).getByText("Inputs and calculation notes"));
-    const notes = within(forecastPanel).getByTestId("forecast-notes");
+    expect(notes.open).toBe(true);
     expect(notes.textContent).toContain(`Revenue growth: ${reverseGrowth} — solver-derived for this Reverse DCF result`);
     expect(notes.textContent).toContain("solver-derived for this Reverse DCF result");
     expect(notes.textContent).toContain("Taxes: EBIT × effective tax rate 20.00%");
     expect(notes.textContent).toContain("Year 1 compares with base-year revenue $1,000.0000m");
+    for (const heading of ["Revenue and operating assumptions", "FCFF construction", "Discounting", "Terminal value and enterprise value"]) {
+      expect(within(notes).getByRole("heading", { name: heading })).toBeTruthy();
+    }
     expect(notes.querySelector('a[href="https://example.test/source"]')).toBeTruthy();
     expect(within(forecastPanel).getByText("Current model output is displayed in USD millions.")).toBeTruthy();
     for (let year = 1; year <= 5; year += 1) expect(within(forecastPanel).getByRole("columnheader", { name: `Year ${year}` })).toBeTruthy();
@@ -53,6 +60,8 @@ describe("dashboard integration", () => {
     expect(within(forecastPanel).getByTestId("forecast-pv-subtotal").textContent).toMatch(/^\$[\d,.]+m$/);
     expect(within(forecastPanel).getByTestId("forecast-terminal-value").textContent).toMatch(/^\$[\d,.]+m$/);
     expect(within(forecastPanel).getByTestId("forecast-pv-terminal").textContent).toMatch(/^\$[\d,.]+m$/);
+    expect(within(forecastPanel).getByText("Undiscounted; reference only")).toBeTruthy();
+    expect(within(forecastPanel).getByText("Modeled EV includes the present value of terminal value.")).toBeTruthy();
     expect(within(forecastPanel).getByText(/sum of the present values of the five forecast FCFFs plus the present value of terminal value/i)).toBeTruthy();
     expect(within(forecastPanel).getByText(/terminal value at year 5 is undiscounted and shown for reference; it is not added directly to this subtotal/i)).toBeTruthy();
     const displayedAmount = (testId: string) => Number(within(forecastPanel).getByTestId(testId).textContent?.replace(/[$,m]/g, ""));
